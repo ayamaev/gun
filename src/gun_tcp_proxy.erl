@@ -25,13 +25,13 @@
 
 -type socket() :: #{
 	%% The pid of the Gun connection.
-	gun_pid := pid(),
+	gun_pid => pid(),
 
 	%% The pid of the process that gets replies for this tunnel.
-	reply_to := pid(),
+	reply_to => pid(),
 
 	%% The full stream reference for this tunnel.
-	stream_ref := gun:stream_ref()
+	stream_ref => gun:stream_ref()
 }.
 
 name() -> tcp_proxy.

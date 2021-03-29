@@ -124,12 +124,12 @@ start_link(Host, Port, Opts, Timeout, OutSocket, OutTransport, Extra) ->
 
 cb_controlling_process(Pid, ControllingPid) ->
 	?DEBUG_LOG("pid ~0p controlling_pid ~0p", [Pid, ControllingPid]),
-	gen_statem:cast(Pid, {?FUNCTION_NAME, ControllingPid}).
+	gen_statem:cast(Pid, {cb_controlling_process, ControllingPid}).
 
 cb_send(Pid, Data) ->
 	?DEBUG_LOG("pid ~0p data ~0p", [Pid, Data]),
 	try
-		gen_statem:call(Pid, {?FUNCTION_NAME, Data})
+		gen_statem:call(Pid, {cb_send, Data})
 	catch
 		exit:{noproc, _} ->
 			{error, closed}
@@ -138,7 +138,7 @@ cb_send(Pid, Data) ->
 cb_setopts(Pid, Opts) ->
 	?DEBUG_LOG("pid ~0p opts ~0p", [Pid, Opts]),
 	try
-		gen_statem:call(Pid, {?FUNCTION_NAME, Opts})
+		gen_statem:call(Pid, {cb_setopts, Opts})
 	catch
 		exit:{noproc, _} ->
 			{error, einval}
@@ -161,24 +161,24 @@ connect(_, _, _, _) ->
 -spec send(pid(), iodata()) -> ok | {error, atom()}.
 send(Pid, Data) ->
 	?DEBUG_LOG("pid ~0p data ~0p", [Pid, Data]),
-	gen_statem:call(Pid, {?FUNCTION_NAME, Data}).
+	gen_statem:call(Pid, {send, Data}).
 
 -spec setopts(pid(), list()) -> ok.
 setopts(Pid, Opts) ->
 	?DEBUG_LOG("pid ~0p opts ~0p", [Pid, Opts]),
-	gen_statem:cast(Pid, {?FUNCTION_NAME, Opts}).
+	gen_statem:cast(Pid, {setopts, Opts}).
 
 -spec sockname(pid())
 	-> {ok, {inet:ip_address(), inet:port_number()}} | {error, atom()}.
 sockname(Pid) ->
 	?DEBUG_LOG("pid ~0p", [Pid]),
-	gen_statem:call(Pid, ?FUNCTION_NAME).
+	gen_statem:call(Pid, sockname).
 
 -spec close(pid()) -> ok.
 close(Pid) ->
 	?DEBUG_LOG("pid ~0p", [Pid]),
 	try
-		gen_statem:call(Pid, ?FUNCTION_NAME)
+		gen_statem:call(Pid, close)
 	catch
 		%% May happen for example when the handshake fails.
 		exit:{noproc, _} ->
@@ -220,10 +220,10 @@ connect_proc(ProxyPid, Host, Port, Opts, Timeout) ->
 		{ok, Socket} ->
 			?DEBUG_LOG("socket ~0p", [Socket]),
 			ok = ssl:controlling_process(Socket, ProxyPid),
-			gen_statem:cast(ProxyPid, {?FUNCTION_NAME, {ok, Socket}});
+			gen_statem:cast(ProxyPid, {connect_proc, {ok, Socket}});
 		Error ->
 			?DEBUG_LOG("error ~0p", [Error]),
-			gen_statem:cast(ProxyPid, {?FUNCTION_NAME, Error})
+			gen_statem:cast(ProxyPid, {connect_proc, Error})
 	end,
 	ok.
 

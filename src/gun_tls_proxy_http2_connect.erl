@@ -25,16 +25,16 @@
 
 -type socket() :: #{
 	%% The pid of the Gun connection.
-	gun_pid := pid(),
+	gun_pid => pid(),
 
 	%% The pid of the process that gets replies for this tunnel.
-	reply_to := pid(),
+	reply_to => pid(),
 
 	%% The full stream reference for this tunnel.
-	stream_ref := gun:stream_ref(),
+	stream_ref => gun:stream_ref(),
 
 	%% The full stream reference for the responsible HTTP/2 stream.
-	handle_continue_stream_ref := gun:stream_ref()
+	handle_continue_stream_ref => gun:stream_ref()
 }.
 
 name() -> tls_proxy_http2_connect.

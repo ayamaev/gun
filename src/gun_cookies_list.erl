@@ -27,7 +27,7 @@
 -export([session_gc/1]).
 
 -type state() :: #{
-	cookies := [gun_cookies:cookie()]
+	cookies => [gun_cookies:cookie()]
 %% @todo	max_cookies_per_domain => non_neg_integer() | infinity,
 %% @todo	max_cookies => non_neg_integer() | infinity
 }.
@@ -85,10 +85,10 @@ query(State, URI=#{scheme := Scheme, host := Host, path := Path},
 	end.
 
 -spec set_cookie_secure_match(state(), #{
-	name := binary(),
+	name => binary(),
 %	secure_only := true,
-	domain := binary(),
-	path := binary()
+	domain => binary(),
+	path => binary()
 }) -> match | nomatch.
 set_cookie_secure_match(#{cookies := Cookies},
 		#{name := Name, domain := Domain, path := Path}) ->
@@ -103,10 +103,10 @@ set_cookie_secure_match(#{cookies := Cookies},
 	end.
 
 -spec set_cookie_get_exact_match(State, #{
-	name := binary(),
-	domain := binary(),
-	host_only := boolean(),
-	path := binary()
+	name => binary(),
+	domain => binary(),
+	host_only => boolean(),
+	path => binary()
 }) -> {ok, gun_cookies:cookie(), State} | error when State::state().
 set_cookie_get_exact_match(State=#{cookies := Cookies0}, Match) ->
 	Result = [Cookie || Cookie <- Cookies0,

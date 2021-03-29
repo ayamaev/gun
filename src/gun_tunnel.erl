@@ -40,10 +40,10 @@
 	%% Fake socket and transport.
 	%% We accept 'undefined' only to simplify the init code.
 	socket = undefined :: #{
-		gun_pid := pid(),
-		reply_to := pid(),
-		stream_ref := gun:stream_ref(),
-		handle_continue_stream_ref := gun:stream_ref()
+		gun_pid => pid(),
+		reply_to => pid(),
+		stream_ref => gun:stream_ref(),
+		handle_continue_stream_ref => gun:stream_ref()
 	} | pid() | undefined,
 	transport = undefined :: gun_tcp_proxy | gun_tls_proxy | undefined,
 
@@ -70,9 +70,9 @@
 	%% The origin socket of the TLS proxy, if any. This is used to forward
 	%% messages to the proxy process in order to decrypt the data.
 	tls_origin_socket = undefined :: undefined | #{
-		gun_pid := pid(),
-		reply_to := pid(),
-		stream_ref := gun:stream_ref(),
+		gun_pid => pid(),
+		reply_to => pid(),
+		stream_ref => gun:stream_ref(),
 		handle_continue_stream_ref => gun:stream_ref()
 	},
 

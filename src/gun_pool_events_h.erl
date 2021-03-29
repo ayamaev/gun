@@ -44,34 +44,34 @@
 -export([terminate/2]).
 
 init(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, init).
 
 domain_lookup_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, domain_lookup_start).
 
 domain_lookup_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, domain_lookup_end).
 
 connect_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, connect_start).
 
 connect_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, connect_end).
 
 tls_handshake_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, tls_handshake_start).
 
 tls_handshake_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, tls_handshake_end).
 
 request_start(Event=#{stream_ref := StreamRef}, State=#{table := Tid}) ->
 	_ = ets:update_counter(Tid, self(), +1, {self(), 0}),
 	propagate(Event, State#{
 		StreamRef => {nofin, nofin}
-	}, ?FUNCTION_NAME).
+	}, request_start).
 
 request_headers(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, request_headers).
 
 request_end(Event=#{stream_ref := StreamRef}, State0=#{table := Tid}) ->
 	State = case State0 of
@@ -81,25 +81,25 @@ request_end(Event=#{stream_ref := StreamRef}, State0=#{table := Tid}) ->
 		#{StreamRef := {nofin, IsFin}} ->
 			State0#{StreamRef => {fin, IsFin}}
 	end,
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, request_end).
 
 push_promise_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, push_promise_start).
 
 push_promise_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, push_promise_end).
 
 response_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, response_start).
 
 response_inform(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, response_inform).
 
 response_headers(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, response_headers).
 
 response_trailers(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, response_trailers).
 
 response_end(Event=#{stream_ref := StreamRef}, State0=#{table := Tid}) ->
 	State = case State0 of
@@ -109,34 +109,34 @@ response_end(Event=#{stream_ref := StreamRef}, State0=#{table := Tid}) ->
 		#{StreamRef := {IsFin, nofin}} ->
 			State0#{StreamRef => {IsFin, fin}}
 	end,
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, response_end).
 
 ws_upgrade(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_upgrade).
 
 ws_recv_frame_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_recv_frame_start).
 
 ws_recv_frame_header(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_recv_frame_header).
 
 ws_recv_frame_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_recv_frame_end).
 
 ws_send_frame_start(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_send_frame_start).
 
 ws_send_frame_end(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, ws_send_frame_end).
 
 protocol_changed(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, protocol_changed).
 
 origin_changed(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, origin_changed).
 
 cancel(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, cancel).
 
 disconnect(Event, State=#{table := Tid}) ->
 	%% The ets:delete/2 call might fail when the pool has shut down.
@@ -145,10 +145,10 @@ disconnect(Event, State=#{table := Tid}) ->
 	catch _:_ ->
 		ok
 	end,
-	propagate(Event, maps:with([event_handler, table], State), ?FUNCTION_NAME).
+	propagate(Event, maps:with([event_handler, table], State), disconnect).
 
 terminate(Event, State) ->
-	propagate(Event, State, ?FUNCTION_NAME).
+	propagate(Event, State, terminate).
 
 propagate(Event, State=#{event_handler := {Mod, ModState0}}, Fun) ->
 	ModState = Mod:Fun(Event, ModState0),

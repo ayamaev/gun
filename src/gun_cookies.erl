@@ -33,18 +33,18 @@
 -export_type([store/0]).
 
 -type cookie() :: #{
-	name := binary(),
-	value := binary(),
-	domain := binary(),
-	path := binary(),
-	creation_time := calendar:datetime(),
-	last_access_time := calendar:datetime(),
-	expiry_time := calendar:datetime() | infinity,
-	persistent := boolean(),
-	host_only := boolean(),
-	secure_only := boolean(),
-	http_only := boolean(),
-	same_site := strict | lax | none
+	name => binary(),
+	value => binary(),
+	domain => binary(),
+	path => binary(),
+	creation_time => calendar:datetime(),
+	last_access_time => calendar:datetime(),
+	expiry_time => calendar:datetime() | infinity,
+	persistent => boolean(),
+	host_only => boolean(),
+	secure_only => boolean(),
+	http_only => boolean(),
+	same_site => strict | lax | none
 }.
 -export_type([cookie/0]).
 
@@ -55,17 +55,17 @@
 	when State::store_state().
 
 -callback set_cookie_secure_match(store_state(), #{
-	name := binary(),
+	name => binary(),
 %	secure_only := true,
-	domain := binary(),
-	path := binary()
+	domain => binary(),
+	path => binary()
 }) -> match | nomatch.
 
 -callback set_cookie_get_exact_match(State, #{
-	name := binary(),
-	domain := binary(),
-	host_only := boolean(),
-	path := binary()
+	name => binary(),
+	domain => binary(),
+	host_only => boolean(),
+	path => binary()
 }) -> {ok, cookie(), State} | error
 	when State::store_state().
 
@@ -343,7 +343,7 @@ store({Mod, State0}, Cookie) ->
 	end.
 
 -spec set_cookie_header(binary(), iodata(), iodata(), cow_http:status(),
-	Headers, Store, #{cookie_ignore_informational := boolean()})
+	Headers, Store, #{cookie_ignore_informational => boolean()})
 	-> {Headers, Store} when Headers :: [{binary(), iodata()}], Store :: undefined | store().
 %% Don't set cookies when cookie store isn't configured.
 set_cookie_header(_, _, _, _, _, Store=undefined, _) ->

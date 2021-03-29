@@ -88,10 +88,16 @@ init(ReplyTo, Socket, Transport, Opts) ->
 	StreamRef = maps:get(stream_ref, Opts, undefined),
 	5 = Version = maps:get(version, Opts, 5),
 	Auth = maps:get(auth, Opts, [none]),
-	Methods = <<case A of
-		{username_password, _, _} -> <<2>>;
-		none -> <<0>>
-	end || A <- Auth>>,
+	Methods = lists:foldr(
+		fun(A, Acc) ->
+			T = case A of
+					{username_password, _, _} -> <<2>>;
+					none -> <<0>>
+				end,
+			<<T/binary, Acc/binary>>
+		end,
+		<<>>,
+		Auth),
 	Transport:send(Socket, [<<5, (length(Auth))>>, Methods]),
 	{connected_no_input, #socks_state{ref=StreamRef, reply_to=ReplyTo, socket=Socket, transport=Transport,
 		opts=Opts, version=Version, status=auth_method_select}}.

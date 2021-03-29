@@ -574,7 +574,7 @@ degraded(info, Msg={gun_upgrade, ConnPid, _, _, _},
 	%% We run the setup function again using the state previously kept.
 	degraded_setup(ConnPid, Msg, StateData, SetupFun, SetupState0);
 degraded(Type, Event, StateData) ->
-	handle_common(Type, Event, ?FUNCTION_NAME, StateData).
+	handle_common(Type, Event, degraded, StateData).
 
 setup_fun(#{setup_fun := SetupFun}) ->
 	SetupFun;
@@ -611,7 +611,7 @@ is_degraded(#state{conns=Conns0}) ->
 	Len =/= length(Ups).
 
 operational(Type, Event, StateData) ->
-	handle_common(Type, Event, ?FUNCTION_NAME, StateData).
+	handle_common(Type, Event, operational, StateData).
 
 handle_common({call, From}, {checkout, _ReqOpts}, _,
 		StateData=#state{conns_meta=ConnsMeta}) ->

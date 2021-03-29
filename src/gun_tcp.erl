@@ -24,10 +24,10 @@
 -export([close/1]).
 
 -type lookup_info() :: #{
-	ip_addresses := [inet:ip_address()],
-	port := inet:port_number(),
-	tcp_module := module(),
-	tcp_opts := [gen_tcp:connect_option()]
+	ip_addresses => [inet:ip_address()],
+	port => inet:port_number(),
+	tcp_module => module(),
+	tcp_opts => [gen_tcp:connect_option()]
 }.
 -export_type([lookup_info/0]).
 

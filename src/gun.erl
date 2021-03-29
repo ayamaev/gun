@@ -157,8 +157,8 @@
 -export_type([opts/0]).
 
 -type connect_destination() :: #{
-	host := inet:hostname() | inet:ip_address(),
-	port := inet:port_number(),
+	host => inet:hostname() | inet:ip_address(),
+	port => inet:port_number(),
 	username => iodata(),
 	password => iodata(),
 	protocols => protocols(),
@@ -169,17 +169,17 @@
 -export_type([connect_destination/0]).
 
 -type intermediary() :: #{
-	type := connect | socks5,
-	host := inet:hostname() | inet:ip_address(),
-	port := inet:port_number(),
-	transport := tcp | tls | tls_proxy,
-	protocol := http | socks
+	type => connect | socks5,
+	host => inet:hostname() | inet:ip_address(),
+	port => inet:port_number(),
+	transport => tcp | tls | tls_proxy,
+	protocol => http | socks
 }.
 
 -type tunnel_info() :: #{
 	%% Tunnel.
-	host := inet:hostname() | inet:ip_address(),
-	port := inet:port_number(),
+	host => inet:hostname() | inet:ip_address(),
+	port => inet:port_number(),
 
 	%% Origin.
 	origin_host => inet:hostname() | inet:ip_address(),
@@ -250,8 +250,8 @@
 -type socks_opts() :: #{
 	version => 5,
 	auth => [{username_password, binary(), binary()} | none],
-	host := inet:hostname() | inet:ip_address(),
-	port := inet:port_number(),
+	host => inet:hostname() | inet:ip_address(),
+	port => inet:port_number(),
 	protocols => protocols(),
 	transport => tcp | tls,
 	tls_opts => [ssl:tls_client_option()],
@@ -992,7 +992,7 @@ not_connected(_, {retries, Retries0, _}, State=#state{opts=Opts}) ->
 not_connected({call, From}, {stream_info, _}, _) ->
 	{keep_state_and_data, {reply, From, {error, not_connected}}};
 not_connected(Type, Event, State) ->
-	handle_common(Type, Event, ?FUNCTION_NAME, State).
+	handle_common(Type, Event, not_connected, State).
 
 default_retry_fun(Retries, Opts) ->
 	%% We retry immediately after a disconnect.
@@ -1033,7 +1033,7 @@ domain_lookup(_, {retries, Retries, _}, State=#state{host=Host, port=Port, opts=
 domain_lookup({call, From}, {stream_info, _}, _) ->
 	{keep_state_and_data, {reply, From, {error, not_connected}}};
 domain_lookup(Type, Event, State) ->
-	handle_common(Type, Event, ?FUNCTION_NAME, State).
+	handle_common(Type, Event, domain_lookup, State).
 
 connecting(_, {retries, Retries, LookupInfo}, State=#state{opts=Opts,
 		transport=Transport, event_handler=EvHandler, event_handler_state=EvHandlerState0}) ->
@@ -1168,7 +1168,7 @@ tls_handshake(info, {gun_tls_proxy, Socket, Error = {error, Reason}, {HandshakeE
 	}, EvHandlerState0),
 	commands([Error], State#state{event_handler_state=EvHandlerState});
 tls_handshake(Type, Event, State) ->
-	handle_common_connected_no_input(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected_no_input(Type, Event, tls_handshake, State).
 
 normal_tls_handshake(Socket, State=#state{
 		origin_host=OriginHost, event_handler=EvHandler, event_handler_state=EvHandlerState0},
@@ -1196,7 +1196,7 @@ normal_tls_handshake(Socket, State=#state{
 	end.
 
 connected_no_input(Type, Event, State) ->
-	handle_common_connected_no_input(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected_no_input(Type, Event, connected_no_input, State).
 
 connected_data_only(cast, Msg, _)
 		when element(1, Msg) =:= headers; element(1, Msg) =:= request;
@@ -1208,7 +1208,7 @@ connected_data_only(cast, Msg, _)
 		"nor does it accept Websocket frames."}},
 	keep_state_and_data;
 connected_data_only(Type, Event, State) ->
-	handle_common_connected(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected(Type, Event, connected_data_only, State).
 
 connected_ws_only(cast, {ws_send, ReplyTo, StreamRef, Frames}, State=#state{
 		protocol=Protocol=gun_ws, protocol_state=ProtoState,
@@ -1225,7 +1225,7 @@ connected_ws_only(cast, Msg, _)
 		"This connection only accepts Websocket frames."}},
 	keep_state_and_data;
 connected_ws_only(Type, Event, State) ->
-	handle_common_connected_no_input(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected_no_input(Type, Event, connected_ws_only, State).
 
 connected(internal, {connected, Socket, NewProtocol},
 		State0=#state{owner=Owner, opts=Opts, transport=Transport}) ->
@@ -1303,7 +1303,7 @@ connected(cast, {ws_send, ReplyTo, StreamRef, Frames}, State=#state{
 		ReplyTo, EvHandler, EvHandlerState0),
 	commands(Commands, State#state{event_handler_state=EvHandlerState});
 connected(Type, Event, State) ->
-	handle_common_connected(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected(Type, Event, connected, State).
 
 %% When the origin is using raw we do not dereference the stream_ref
 %% because it expects the full stream_ref to function (there's no
@@ -1359,7 +1359,7 @@ closing(cast, {ws_upgrade, ReplyTo, StreamRef, _Path, _Headers, _WsOpts},
 	ReplyTo ! {gun_error, self(), StreamRef, closing},
 	{keep_state, State};
 closing(Type, Event, State) ->
-	handle_common_connected(Type, Event, ?FUNCTION_NAME, State).
+	handle_common_connected(Type, Event, closing, State).
 
 %% Common events when we have a connection.
 %%
